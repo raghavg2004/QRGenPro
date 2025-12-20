@@ -497,38 +497,67 @@
         }
 
         // --- Email Logic (Simulation) ---
-        function handleEmailSend() {
-            const emailInput = document.getElementById('user-email');
-            const btn = document.getElementById('send-btn');
-            const email = emailInput.value;
+        async function handleEmailSend() {
+    const emailInput = document.getElementById('user-email');
+    const email = emailInput.value.trim();
 
-            if (!email || !email.includes('@')) {
-                showToast('Please enter a valid email address.');
-                return;
-            }
-            if(!qrText.value) {
-                showToast('Please create a QR code first.');
-                return;
-            }
+    if(!email || !email.includes('@')) {
+        showToast('Please enter a valid email address.');
+        return;
+    }
 
-            // Simulate Loading State
-            const originalContent = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<div class="loader"></div>`;
-            
-            // Mock server delay
-            setTimeout(() => {
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-                
-                // Show Success Modal
-                document.getElementById('modal-email').innerText = email;
-                document.getElementById('success-modal').classList.remove('hidden');
-                
-                // Clear email input
-                emailInput.value = '';
-            }, 2000);
+    // Generate QR formats as blobs
+    const qrCanvas = document.getElementById('qr-canvas');
+    const pngBlob = await new Promise(r => qrCanvas.toBlob(r, 'image/png'));
+    const jpgBlob = await new Promise(r => qrCanvas.toBlob(r, 'image/jpeg', 0.9));
+    const pdfBlob = new Blob([await generatePDFBlob()], { type: 'application/pdf' });
+
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('files', pngBlob, 'qrcode.png');
+    formData.append('files', jpgBlob, 'qrcode.jpg');
+    formData.append('files', pdfBlob, 'qrcode.pdf');
+
+    const btn = document.getElementById('send-btn');
+    const originalContent = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<div class="loader"></div>`;
+
+    try {
+        const res = await fetch('http://localhost:3000/send-email', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if(data.success) {
+            document.getElementById('modal-email').innerText = email;
+            document.getElementById('success-modal').classList.remove('hidden');
+            emailInput.value = '';
+        } else {
+            showToast(data.message || 'Error sending email.');
         }
+    } catch (err) {
+        console.error(err);
+        showToast('Server error. Email not sent.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
+    }
+}
+
+// Helper to create PDF blob (similar to your downloadQR)
+async function generatePDFBlob() {
+    const { jsPDF } = window.jspdf;
+    const qrCanvas = document.getElementById('qr-canvas');
+    const doc = new jsPDF();
+    const imgData = qrCanvas.toDataURL('image/png');
+    doc.addImage(imgData, 'PNG', 50, 50, 100, 100);
+    return doc.output('blob');
+}
+
+
 
         function closeModal() {
             document.getElementById('success-modal').classList.add('hidden');

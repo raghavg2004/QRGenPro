@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRGenPro</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Favicon / Website Icon -->
+    <link rel="icon" href="icon.png" type="image/png">
+    <!-- Better browser support -->
+    <link rel="apple-touch-icon" href="icon.png">
+    <!-- Optional: fallback -->
+    <link rel="shortcut icon" href="icon.png" type="image/png">
+
+    <!-- Primary Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRGenPro - Create QR Codes Online</title>
+    <meta name="description" content="Generate QR codes for websites, text, and more instantly. Customize colors, templates, and download as PNG, JPG, or PDF with QRGenPro.">
+    <meta name="keywords" content="QR code generator, free QR code, online QR generator, QR code templates, QR code download, QRGenPro">
+    <meta name="author" content="DevHorizan">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="QRGenPro - Create QR Codes Online">
+    <meta property="og:description" content="Generate QR codes for websites, text, and more instantly. Customize colors, templates, and download as PNG, JPG, or PDF with QRGenPro.">
+    <meta property="og:image" content="https://yourdomain.com/icon.png">
+    <meta property="og:url" content="https://yourdomain.com">
+    <meta property="og:site_name" content="QRGenPro">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="QRGenPro - Create QR Codes Online">
+    <meta name="twitter:description" content="Generate QR codes for websites, text, and more instantly. Customize colors, templates, and download as PNG, JPG, or PDF with QRGenPro.">
+    <meta name="twitter:image" content="https://yourdomain.com/icon.png">
+    <meta name="twitter:creator" content="@DevHorizan">
+
+    <!-- Favicon / Website Icon -->
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="shortcut icon" href="icon.png" type="image/png">
+
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "QRGenPro",
+    "url": "https://yourdomain.com",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://yourdomain.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+    },
+    "description": "QRGenPro is a free online QR code generator with customizable colors, templates, and multiple download formats."
+    }
+    </script>
+
+    <!-- QR Code Library (QRious) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .canvas-container {
+            background-image: 
+                linear-gradient(45deg, #e5e7eb 25%, transparent 25%), 
+                linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #e5e7eb 75%), 
+                linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Floating Glass Header -->
+    <header id="floatingHeader"
+        class="fixed top-4 left-1/2 -translate-x-1/2 z-50
+            transition-all duration-300 ease-in-out">
+        
+        <div class="bg-white/70 backdrop-blur-xl shadow-lg border border-gray-200
+                    rounded-2xl px-6 py-3 flex items-center gap-6">
+            
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-qrcode text-blue-600 text-xl"></i>
+                <span class="font-semibold text-gray-900">QRGenPro</span>
+            </div>
+        </div>
+    </header>
+    <script>
+    const header = document.getElementById('floatingHeader');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            // Hide header
+            header.classList.add('opacity-0', '-translate-y-6', 'pointer-events-none');
+        } else {
+            // Show header
+            header.classList.remove('opacity-0', '-translate-y-6', 'pointer-events-none');
+        }
+    });
+    </script>
+
+
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+            
+            <!-- Left Column: Controls -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- Section 1: Content -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-blue-500"></i> Content
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Website URL or Text</label>
+                            <input type="text" id="qr-text" placeholder="https://www.example.com" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none"
+                                value="https://google.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Templates & Colors -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-palette text-purple-500"></i> Design & Templates
+                    </h2>
+                    
+                    <!-- Templates -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Free Templates</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <button onclick="applyTemplate('classic')" class="flex flex-col items-center justify-center p-3 border rounded-lg hover:bg-gray-50 transition group">
+                                <div class="w-6 h-6 bg-black mb-2 rounded-sm group-hover:scale-110 transition"></div>
+                                <span class="text-xs text-gray-600">Classic</span>
+                            </button>
+                            <button onclick="applyTemplate('ocean')" class="flex flex-col items-center justify-center p-3 border rounded-lg hover:bg-blue-50 transition group">
+                                <div class="w-6 h-6 bg-blue-600 mb-2 rounded-sm group-hover:scale-110 transition"></div>
+                                <span class="text-xs text-gray-600">Ocean</span>
+                            </button>
+                            <button onclick="applyTemplate('nature')" class="flex flex-col items-center justify-center p-3 border rounded-lg hover:bg-green-50 transition group">
+                                <div class="w-6 h-6 bg-green-600 mb-2 rounded-sm group-hover:scale-110 transition"></div>
+                                <span class="text-xs text-gray-600">Nature</span>
+                            </button>
+                            <button onclick="applyTemplate('sunset')" class="flex flex-col items-center justify-center p-3 border rounded-lg hover:bg-orange-50 transition group">
+                                <div class="w-6 h-6 bg-orange-600 mb-2 rounded-sm group-hover:scale-110 transition"></div>
+                                <span class="text-xs text-gray-600">Sunset</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Colors -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Foreground Color</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="qr-foreground" class="h-10 w-14 rounded cursor-pointer border-0 bg-transparent p-0" value="#000000">
+                                <span id="fg-hex" class="text-sm text-gray-500">#000000</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="qr-background" class="h-10 w-14 rounded cursor-pointer border-0 bg-transparent p-0" value="#ffffff">
+                                <div class="flex items-center gap-2">
+                                    <span id="bg-hex" class="text-sm text-gray-500">#FFFFFF</span>
+                                    <label class="flex items-center space-x-2 cursor-pointer ml-2">
+                                        <input type="checkbox" id="transparent-bg" class="rounded text-blue-600 focus:ring-blue-500 h-4 w-4">
+                                        <span class="text-sm text-gray-600">Transparent</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Email Options -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-sm border border-blue-100 p-6">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-envelope text-blue-600"></i> Email Delivery
+                    </h2>
+                    <p class="text-sm text-gray-600 mb-4">Send all formats (PDF, JPG, PNG) directly to your inbox.</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="email" id="user-email" placeholder="Enter your email address" 
+                            class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <button onclick="handleEmailSend()" id="send-btn"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition shadow-md flex items-center justify-center gap-2">
+                            <span>Send</span>
+                            <i class="fa-regular fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-lock"></i> Your email is secure and used only for delivery.</p>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Preview & Download -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8 sticky top-6">
+                    <h2 class="text-center text-lg font-semibold text-gray-800 mb-6">Live Preview</h2>
+                    
+                    <!-- Canvas Container -->
+                    <div class="flex justify-center mb-8">
+                        <div class="canvas-container p-4 rounded-xl shadow-inner border border-gray-200">
+                            <canvas id="qr-canvas" class="rounded-lg shadow-sm"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Size Slider (Hidden Logic mostly, but good for UX)
+                    <div class="mb-6 px-4">
+                        <label class="block text-sm text-gray-500 mb-1 text-center">Resolution Quality</label>
+                        <input type="range" min="200" max="1000" value="400" id="qr-size" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div> -->
+
+                    <!-- Download Buttons -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="downloadQR('png')" class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition shadow-sm">
+                            <i class="fa-solid fa-image"></i> PNG
+                        </button>
+                        <button onclick="downloadQR('jpg')" class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition shadow-sm">
+                            <i class="fa-solid fa-photo-film"></i> JPG
+                        </button>
+                        <button onclick="downloadQR('pdf')" class="flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm col-span-2">
+                            <i class="fa-solid fa-file-pdf"></i> Download PDF
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <p class="text-center text-gray-500 text-sm">
+                &copy; <span id="current-year"></span>
+                Made with ❤️ by
+                <a href="https://devhorizan.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-bold hover:underline">
+                    DevHorizan
+                </a>
+                | QRGenPro - Free QR Code Generator
+            </p>
+        </div>
+    </footer>
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center px-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 transform transition-all scale-100">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                    <i class="fa-solid fa-check text-green-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">Email Sent!</h3>
+                <p class="text-sm text-gray-500 mb-6">
+                    We've sent the QR code in PNG, JPG, and PDF formats to <span id="modal-email" class="font-bold text-gray-800"></span>.
+                </p>
+                <button onclick="closeModal()" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm">
+                    Awesome, thanks!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert for Empty Input -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
+            <i class="fa-solid fa-circle-info text-yellow-400"></i>
+            <span id="toast-msg">Please enter text or a URL first.</span>
+        </div>
+    </div>
+
+    <script>
+        // --- Initialization ---
+        const qrCanvas = document.getElementById('qr-canvas');
+        const qrText = document.getElementById('qr-text');
+        const qrForeground = document.getElementById('qr-foreground');
+        const qrBackground = document.getElementById('qr-background');
+        const transparentCheck = document.getElementById('transparent-bg');
+        // const sizeSlider = document.getElementById('qr-size');
+        const fgHex = document.getElementById('fg-hex');
+        const bgHex = document.getElementById('bg-hex');
+        
+        let qr;
+
+        // --- Core QR Generation ---
+        function generateQR() {
+            const value = qrText.value.trim();
+            const size = 400; // fixed size for live preview
+            const fg = qrForeground.value;
+            // Handle transparent background logic
+            const bg = transparentCheck.checked ? null : qrBackground.value;
+            
+            // Note: QRious handles transparency if 'background' is not set or set to null/alpha
+            // However, QRious API expects 'backgroundAlpha' for transparency usually
+            
+            if (!qr) {
+                qr = new QRious({
+                    element: qrCanvas,
+                    value: value || "https://example.com",
+                    size: size,
+                    foreground: fg,
+                    background: bg || "white",
+                    backgroundAlpha: transparentCheck.checked ? 0 : 1,
+                    level: 'H' // High error correction
+                });
+            } else {
+                qr.set({
+                    value: value || "https://example.com",
+                    size: size,
+                    foreground: fg,
+                    background: bg || "white",
+                    backgroundAlpha: transparentCheck.checked ? 0 : 1
+                });
+            }
+        }
+
+        // --- Event Listeners ---
+        // Update on text change
+        qrText.addEventListener('input', generateQR);
+        
+        // Update on color change
+        qrForeground.addEventListener('input', (e) => {
+            fgHex.textContent = e.target.value.toUpperCase();
+            generateQR();
+        });
+        
+        qrBackground.addEventListener('input', (e) => {
+            bgHex.textContent = e.target.value.toUpperCase();
+            if(!transparentCheck.checked) generateQR();
+        });
+
+        // Update on checkbox (Transparent)
+        transparentCheck.addEventListener('change', (e) => {
+            if(e.target.checked) {
+                qrBackground.disabled = true;
+                bgHex.classList.add('text-gray-300');
+            } else {
+                qrBackground.disabled = false;
+                bgHex.classList.remove('text-gray-300');
+            }
+            generateQR();
+        });
+
+        // Update on size slider change
+        //sizeSlider.addEventListener('input', generateQR);
+
+        // --- Templates Logic ---
+        function applyTemplate(type) {
+            transparentCheck.checked = false;
+            qrBackground.disabled = false;
+            bgHex.classList.remove('text-gray-300');
+
+            switch(type) {
+                case 'classic':
+                    qrForeground.value = "#000000";
+                    qrBackground.value = "#ffffff";
+                    break;
+                case 'ocean':
+                    qrForeground.value = "#1e40af"; // Blue 800
+                    qrBackground.value = "#eff6ff"; // Blue 50
+                    break;
+                case 'nature':
+                    qrForeground.value = "#166534"; // Green 800
+                    qrBackground.value = "#f0fdf4"; // Green 50
+                    break;
+                case 'sunset':
+                    qrForeground.value = "#9a3412"; // Orange 800
+                    qrBackground.value = "#fff7ed"; // Orange 50
+                    break;
+            }
+            
+            // Update UI Hex labels
+            fgHex.textContent = qrForeground.value.toUpperCase();
+            bgHex.textContent = qrBackground.value.toUpperCase();
+            
+            generateQR();
+        }
+
+        // --- Download Functions ---
+        function downloadQR(format) {
+            const link = document.createElement('a');
+            const fileName = `qrcode-${Date.now()}`;
+
+            if (format === 'png') {
+                link.download = `${fileName}.png`;
+                link.href = qrCanvas.toDataURL("image/png");
+                link.click();
+            } else if (format === 'jpg') {
+                // JPG doesn't support transparency, fill white if transparent
+                if(transparentCheck.checked) {
+                    // Create a temporary canvas to draw white bg
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = qrCanvas.width;
+                    tempCanvas.height = qrCanvas.height;
+                    const ctx = tempCanvas.getContext('2d');
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                    ctx.drawImage(qrCanvas, 0, 0);
+                    link.download = `${fileName}.jpg`;
+                    link.href = tempCanvas.toDataURL("image/jpeg", 0.9);
+                } else {
+                    link.download = `${fileName}.jpg`;
+                    link.href = qrCanvas.toDataURL("image/jpeg", 0.9);
+                }
+                link.click();
+            } else if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add Logo/Branding to PDF
+                doc.setFontSize(22);
+                doc.setTextColor(37, 99, 235); // Blue color
+                doc.text("QRGenPro", 105, 20, null, null, "center");
+                
+                doc.setFontSize(12);
+                doc.setTextColor(100);
+                doc.text("Your custom generated QR Code", 105, 30, null, null, "center");
+
+                // Get image data
+                const imgData = qrCanvas.toDataURL("image/png");
+                
+                // Add Image (centered)
+                // A4 width is 210mm. 
+                const imgWidth = 100;
+                const x = (210 - imgWidth) / 2;
+                doc.addImage(imgData, 'PNG', x, 50, imgWidth, imgWidth);
+                
+                // Add URL text
+                doc.setFontSize(10);
+                doc.setTextColor(150);
+                const url = qrText.value || "https://example.com";
+                // simple truncate if too long
+                const displayUrl = url.length > 50 ? url.substring(0, 50) + "..." : url;
+                doc.text(displayUrl, 105, 50 + imgWidth + 10, null, null, "center");
+
+                doc.save(`${fileName}.pdf`);
+            }
+        }
+
+        // --- Email Logic (Simulation) ---
+        function handleEmailSend() {
+            const emailInput = document.getElementById('user-email');
+            const btn = document.getElementById('send-btn');
+            const email = emailInput.value;
+
+            if (!email || !email.includes('@')) {
+                showToast('Please enter a valid email address.');
+                return;
+            }
+            if(!qrText.value) {
+                showToast('Please create a QR code first.');
+                return;
+            }
+
+            // Simulate Loading State
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loader"></div>`;
+            
+            // Mock server delay
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                
+                // Show Success Modal
+                document.getElementById('modal-email').innerText = email;
+                document.getElementById('success-modal').classList.remove('hidden');
+                
+                // Clear email input
+                emailInput.value = '';
+            }, 2000);
+        }
+
+        function closeModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+
+        // --- Toast Notification ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-msg');
+            msg.innerText = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initial Generation
+        window.onload = function() {
+            generateQR();
+        }
+
+    </script>
+</body>
+</html>

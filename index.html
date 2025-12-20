@@ -265,56 +265,19 @@
                         </button>
                     </form>
 
+                    <form id="email-form" action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data">
+    <input type="email" name="email" required placeholder="Enter your email">
+    <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY">
+    <input type="hidden" name="subject" value="Your QRGenPro QR Code">
+    <input type="hidden" name="from_name" value="QRGenPro">
+    <input type="hidden" name="redirect" value="https://pro-gen-qr.vercel.app/">
+    <button type="submit">Send</button>
+</form>
+
+
                     <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-lock"></i> Your email is secure and used only for delivery.</p>
                 </div>
-                <script>
-                    function dataURLtoBlob(dataurl) {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], {type:mime});
-}
-
-emailForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const btn = document.getElementById('send-btn');
-    btn.disabled = true;
-    btn.innerHTML = `<div class="loader"></div>`;
-
-    const formData = new FormData(emailForm);
-    const qrBlob = dataURLtoBlob(qrCanvas.toDataURL('image/png'));
-    formData.append('files[]', qrBlob, 'qrcode.png');
-
-    try {
-        const res = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            body: formData
-        });
-        const result = await res.json();
-
-        if(result.success){
-            document.getElementById('modal-email').innerText = emailForm.email.value;
-            document.getElementById('success-modal').classList.remove('hidden');
-            emailForm.reset();
-        } else {
-            showToast('Failed to send email.');
-        }
-    } catch(err) {
-        showToast('Error sending email.');
-        console.error(err);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<span>Send</span><i class="fa-regular fa-paper-plane"></i>`;
-    }
-});
-
-                </script>
+                
             </div>
 
             <!-- Right Column: Preview & Download -->

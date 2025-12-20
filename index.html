@@ -224,7 +224,7 @@
                     </div>
                 </div>
 
-                <!-- Section 3: Email Options 
+                <!-- Section 3: Email Options -->
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-sm border border-blue-100 p-6">
                     <h2 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
                         <i class="fa-solid fa-envelope text-blue-600"></i> Email Delivery
@@ -241,43 +241,8 @@
                         </button>
                     </div>
                     <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-lock"></i> Your email is secure and used only for delivery.</p>
-                </div>-->
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-sm border border-blue-100 p-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-envelope text-blue-600"></i> Email Delivery
-                    </h2>
-                    <p class="text-sm text-gray-600 mb-4">Send all formats (PDF, JPG, PNG) directly to your inbox.</p>
-                    
-                    <form id="email-form" class="flex flex-col sm:flex-row gap-3">
-                        <input type="email" name="email" id="user-email" placeholder="Enter your email address" required
-                            class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                        
-                        <!-- Web3Forms required hidden fields -->
-                        <input type="hidden" name="access_key" value="c274894f-5ff2-48a5-85e8-abfca832e83b">
-                        <input type="hidden" name="subject" value="Your QRGenPro QR Code">
-                        <input type="hidden" name="from_name" value="QRGenPro">
-                        <input type="hidden" name="redirect" value="https://pro-gen-qr.vercel.app/"> <!-- optional redirect URL -->
-
-                        <button type="submit" id="send-btn"
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition shadow-md flex items-center justify-center gap-2">
-                            <span>Send</span>
-                            <i class="fa-regular fa-paper-plane"></i>
-                        </button>
-                    </form>
-
-                    <form id="email-form" action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data">
-    <input type="email" name="email" required placeholder="Enter your email">
-    <input type="hidden" name="access_key" value="c274894f-5ff2-48a5-85e8-abfca832e83b">
-    <input type="hidden" name="subject" value="Your QRGenPro QR Code">
-    <input type="hidden" name="from_name" value="QRGenPro">
-    <input type="hidden" name="redirect" value="https://pro-gen-qr.vercel.app/">
-    <button type="submit">Send</button>
-</form>
-
-
-                    <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-lock"></i> Your email is secure and used only for delivery.</p>
                 </div>
-                
+
             </div>
 
             <!-- Right Column: Preview & Download -->

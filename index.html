@@ -524,8 +524,8 @@
     btn.innerHTML = `<div class="loader"></div>`;
 
     try {
-        const res = await fetch('http://localhost:3000/send-email', {
-            method: 'POST',
+        const res = await fetch("/api/send-email", {
+            method: "POST",
             body: formData
         });
 

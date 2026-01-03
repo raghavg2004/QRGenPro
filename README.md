@@ -2,14 +2,6 @@
 
 Generate high-quality QR codes with ease and integrate them seamlessly into your applications.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/raghavg2004/QRGenPro/releases)
-[![License](https://img.shields.io/badge/license/QRGenPro-green)](https://github.com/raghavg2004/QRGenPro/blob/main/LICENSE) <!-- Placeholder for potential future license -->
-![Stars](https://img.shields.io/github/stars/raghavg2004/QRGenPro?style=social)
-![Forks](https://img.shields.io/github/forks/raghavg2004/QRGenPro?style=social)
-
-![QRGenPro Preview](/preview_example.png)
-_A preview of the QRGenPro application interface._
-
 ---
 
 ## ✨ Features

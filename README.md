@@ -1,6 +1,6 @@
 <h1 style="display:flex; align-items:center; gap:12px;">
 	<img src="/icon.png" alt="QRGenPro" style="height:1em; width:auto; display:inline-block;" />
-	<spanQRGenPro</span>
+	<span>QRGenPro</span>
 </h1>
 
 Generate high-quality QR codes with ease and integrate them seamlessly into your applications.

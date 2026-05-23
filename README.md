@@ -123,9 +123,6 @@ generateUrlQrCode('https://github.com/raghavg2004/QRGenPro');
 
 For specific API endpoints and expected payloads, refer to the `api` and `server.js` directories.
 
-![Usage Screenshot](/usage_example.png)
-_Example of a generated QR code within the application._
-
 ---
 
 ## 🗺️ Project Roadmap
